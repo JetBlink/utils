@@ -8,13 +8,12 @@ import (
 	"time"
 )
 
-func Recover() func() {
+func Recover(handler func(stack string)) func() {
 	return func() {
 		if r := recover(); r != nil {
 			stack := Stack(3)
-			//reset := string([]byte{27, 91, 48, 109})
-			reset := ""
-			fmt.Printf("[%s] panic recovered: %s\n%s%s", TimeFormat(time.Now()), r, stack, reset)
+			reset := string([]byte{27, 91, 48, 109})
+			handler(fmt.Sprintf("[%s] panic recovered: %s\n%s%s", TimeFormat(time.Now()), r, stack, reset))
 		}
 	}
 }
