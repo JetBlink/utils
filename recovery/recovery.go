@@ -14,7 +14,7 @@ func Recover() func() {
 			stack := Stack(3)
 			//reset := string([]byte{27, 91, 48, 109})
 			reset := ""
-			fmt.Printf("[%s] panic recovered: %s\n%s%s", timeFormat(time.Now()), r, stack, reset)
+			fmt.Printf("[%s] panic recovered: %s\n%s%s", TimeFormat(time.Now()), r, stack, reset)
 		}
 	}
 }
@@ -87,6 +87,6 @@ func function(pc uintptr) []byte {
 	return name
 }
 
-func timeFormat(t time.Time) string {
+func TimeFormat(t time.Time) string {
 	return t.Format("2006/01/02 15:04:05")
 }
