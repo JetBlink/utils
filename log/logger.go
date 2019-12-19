@@ -11,7 +11,6 @@ import (
 
 	"go.uber.org/zap"
 	"go.uber.org/zap/zapcore"
-	"gopkg.in/natefinch/lumberjack.v2"
 )
 
 var logger *zap.Logger
@@ -68,15 +67,16 @@ func newProduction() (err error) {
 		},
 	}
 
-	//w := os.Stdout
+	w := os.Stdout
 
-	w := &lumberjack.Logger{
-		Filename:   "/tmp/log-test-demo.log",
-		MaxSize:    500, // megabytes
-		MaxBackups: 3,
-		MaxAge:     1,    //days
-		Compress:   true, // disabled by default
-	}
+	//https://github.com/natefinch/lumberjack
+	//w := &lumberjack.Logger{
+	//	Filename:   "/tmp/log-test-demo.log",
+	//	MaxSize:    500, // megabytes
+	//	MaxBackups: 3,
+	//	MaxAge:     1,    //days
+	//	Compress:   true, // disabled by default
+	//}
 
 	sink := zapcore.AddSync(w)
 
