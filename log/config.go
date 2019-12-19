@@ -27,16 +27,13 @@ type Config struct {
 	// Encoding sets the logger's encoding. Valid values are "json" and
 	// "console", as well as any third-party encodings registered via
 	// RegisterEncoder.
-	Encoding string `json:"encoding" yaml:"encoding"`
-	// EncoderConfig sets options for the chosen encoder. See
-	// zapcore.EncoderConfig for details.
-	EncoderConfig zapcore.EncoderConfig `json:"encoderConfig" yaml:"encoderConfig"`
+	Encoder zapcore.Encoder
+
+	WriteSyncer zapcore.WriteSyncer
 }
 
-func (cfg Config) Build(constructor func(zapcore.EncoderConfig) zapcore.Encoder, sink zapcore.WriteSyncer, opts ...zap.Option) *zap.Logger {
-	enc := constructor(cfg.EncoderConfig)
-
-	core := zapcore.NewCore(enc, sink, cfg.Level)
+func (cfg Config) Build(opts ...zap.Option) *zap.Logger {
+	core := zapcore.NewCore(cfg.Encoder, cfg.WriteSyncer, cfg.Level)
 
 	log := zap.New(core, cfg.buildOptions()...)
 	if len(opts) > 0 {
