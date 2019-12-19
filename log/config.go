@@ -52,6 +52,7 @@ func (cfg Config) buildOptions() []zap.Option {
 
 	if !cfg.DisableCaller {
 		opts = append(opts, zap.AddCaller())
+		opts = append(opts, zap.AddCallerSkip(1))
 	}
 
 	stackLevel := zap.ErrorLevel
