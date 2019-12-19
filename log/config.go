@@ -38,7 +38,12 @@ func (cfg Config) Build(constructor func(zapcore.EncoderConfig) zapcore.Encoder,
 
 	core := zapcore.NewCore(enc, sink, cfg.Level)
 
-	return zap.New(core, cfg.buildOptions()...)
+	log := zap.New(core, cfg.buildOptions()...)
+	if len(opts) > 0 {
+		log = log.WithOptions(opts...)
+	}
+
+	return log
 }
 
 func (cfg Config) buildOptions() []zap.Option {
