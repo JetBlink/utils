@@ -1,6 +1,7 @@
 package log
 
 import (
+	"sort"
 	"time"
 
 	"go.uber.org/zap"
@@ -31,8 +32,11 @@ type Config struct {
 	// "console", as well as any third-party encodings registered via
 	// RegisterEncoder.
 	Encoder zapcore.Encoder
-
+	// A WriteSyncer is an io.Writer that can also flush any buffered data. Note
+	// that *os.File (and thus, os.Stderr and os.Stdout) implement WriteSyncer.
 	WriteSyncer zapcore.WriteSyncer
+	// InitialFields is a collection of fields to add to the root logger.
+	InitialFields map[string]interface{} `json:"initialFields" yaml:"initialFields"`
 }
 
 func (cfg Config) Build(opts ...zap.Option) *zap.Logger {
@@ -70,6 +74,19 @@ func (cfg Config) buildOptions() []zap.Option {
 		opts = append(opts, zap.WrapCore(func(core zapcore.Core) zapcore.Core {
 			return zapcore.NewSampler(core, time.Second, int(cfg.Sampling.Initial), int(cfg.Sampling.Thereafter))
 		}))
+	}
+
+	if len(cfg.InitialFields) > 0 {
+		fs := make([]zap.Field, 0, len(cfg.InitialFields))
+		keys := make([]string, 0, len(cfg.InitialFields))
+		for k := range cfg.InitialFields {
+			keys = append(keys, k)
+		}
+		sort.Strings(keys)
+		for _, k := range keys {
+			fs = append(fs, zap.Any(k, cfg.InitialFields[k]))
+		}
+		opts = append(opts, zap.Fields(fs...))
 	}
 
 	return opts
