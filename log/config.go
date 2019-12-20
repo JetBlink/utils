@@ -23,6 +23,9 @@ type Config struct {
 	// development and ErrorLevel and above in production.
 	DisableStacktrace bool `json:"disableStacktrace" yaml:"disableStacktrace"`
 	// Sampling sets a sampling policy. A nil SamplingConfig disables sampling.
+	// 日志记录限流
+	// 每秒日志数量为Initial，如果超过，则每 Thereafter 条才记录
+	// 每秒计数器会重置
 	Sampling *zap.SamplingConfig `json:"sampling" yaml:"sampling"`
 	// Encoding sets the logger's encoding. Valid values are "json" and
 	// "console", as well as any third-party encodings registered via

@@ -76,10 +76,10 @@ func newProduction() (err error) {
 		Development: false,
 		Encoder:     zapcore.NewJSONEncoder(zap.NewProductionEncoderConfig()),
 		WriteSyncer: sink,
-		Sampling: &zap.SamplingConfig{
-			Initial:    100,
-			Thereafter: 100,
-		},
+		//Sampling: &zap.SamplingConfig{
+		//	Initial:    100,
+		//	Thereafter: 100,
+		//},
 	}
 
 	logger = config.Build()
