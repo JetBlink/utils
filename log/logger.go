@@ -27,38 +27,42 @@ func SetLogger(log *zap.Logger) {
 	logger = log
 }
 
-func New(development bool) error {
+func New(development bool) (err error) {
 	if logger != nil {
 		return nil
 	}
 
+	var cfg Config
+
 	if development {
-		return newDevelopment()
+		cfg = NewDevelopment()
+	} else {
+		cfg = NewProduction()
+	}
+	if err != nil {
+		return err
 	}
 
-	return newProduction()
+	logger = cfg.Build()
+	return
 }
 
-func newDevelopment() (err error) {
+func NewDevelopment() Config {
 	encoderConfig := zap.NewDevelopmentEncoderConfig()
 	encoderConfig.EncodeLevel = zapcore.CapitalColorLevelEncoder
 
 	w := os.Stdout
 	sink := zapcore.AddSync(w)
 
-	config := Config{
+	return Config{
 		Level:       zap.NewAtomicLevelAt(zap.DebugLevel),
 		Development: true,
 		Encoder:     zapcore.NewConsoleEncoder(encoderConfig),
 		WriteSyncer: sink,
 	}
-
-	logger = config.Build()
-
-	return
 }
 
-func newProduction() (err error) {
+func NewProduction() Config {
 	//https://github.com/natefinch/lumberjack
 	//w := &lumberjack.Logger{
 	//	Filename:   "/tmp/log-test-demo.log",
@@ -71,7 +75,7 @@ func newProduction() (err error) {
 	w := os.Stdout
 	sink := zapcore.AddSync(w)
 
-	config := Config{
+	return Config{
 		Level:       zap.NewAtomicLevelAt(zap.InfoLevel),
 		Development: false,
 		Encoder:     zapcore.NewJSONEncoder(zap.NewProductionEncoderConfig()),
@@ -81,10 +85,6 @@ func newProduction() (err error) {
 		//	Thereafter: 100,
 		//},
 	}
-
-	logger = config.Build()
-
-	return
 }
 
 func Sync() error {
