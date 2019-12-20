@@ -7,6 +7,7 @@
 package log
 
 import (
+	"errors"
 	"os"
 
 	"go.uber.org/zap"
@@ -19,17 +20,18 @@ func Logger() *zap.Logger {
 	return logger
 }
 
-func SetLogger(log *zap.Logger) {
+func SetLogger(log *zap.Logger) error {
 	if logger != nil {
-		return
+		return errors.New("logger is not nil")
 	}
 
 	logger = log
+	return nil
 }
 
-func New(development bool) (err error) {
+func New(development bool) {
 	if logger != nil {
-		return nil
+		return
 	}
 
 	var cfg Config
@@ -39,12 +41,8 @@ func New(development bool) (err error) {
 	} else {
 		cfg = NewProduction()
 	}
-	if err != nil {
-		return err
-	}
 
 	logger = cfg.Build()
-	return
 }
 
 func NewDevelopment() Config {
