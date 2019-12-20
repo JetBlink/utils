@@ -42,7 +42,20 @@ func New(development bool) {
 		cfg = NewProduction()
 	}
 
-	logger = cfg.Build()
+	opts := make([]zap.Option, 0, 1)
+	//opts = append(opts, zap.Hooks(func(entry zapcore.Entry) error {
+	//	if zap.WarnLevel.Enabled(entry.Level) {
+	//		go func() {
+	//			if err := dingtalk.Instance("").SendTextMessage(base.ToJsonString(entry), nil, false); err != nil {
+	//				fmt.Println("钉钉发送消息失败:" + err.Error())
+	//			}
+	//		}()
+	//	}
+	//
+	//	return nil
+	//}))
+
+	logger = cfg.Build(opts...)
 }
 
 func NewDevelopment() Config {
@@ -61,6 +74,9 @@ func NewDevelopment() Config {
 }
 
 func NewProduction() Config {
+	encoderConfig := zap.NewProductionEncoderConfig()
+	encoderConfig.EncodeTime = zapcore.ISO8601TimeEncoder
+
 	//https://github.com/natefinch/lumberjack
 	//w := &lumberjack.Logger{
 	//	Filename:   "/tmp/log-test-demo.log",
@@ -76,8 +92,11 @@ func NewProduction() Config {
 	return Config{
 		Level:       zap.NewAtomicLevelAt(zap.InfoLevel),
 		Development: false,
-		Encoder:     zapcore.NewJSONEncoder(zap.NewProductionEncoderConfig()),
+		Encoder:     zapcore.NewJSONEncoder(encoderConfig),
 		WriteSyncer: sink,
+		//InitialFields: map[string]interface{}{
+		//	"app_name": "app_name",
+		//},
 		//Sampling: &zap.SamplingConfig{
 		//	Initial:    100,
 		//	Thereafter: 100,
@@ -106,6 +125,8 @@ func Error(msg string, fields ...zap.Field) {
 	logger.Error(msg, fields...)
 }
 
+//DPanic DPanic means "development panic"
+//Deprecated: 不建议采用
 func DPanic(msg string, fields ...zap.Field) {
 	logger.DPanic(msg, fields...)
 }
