@@ -49,7 +49,9 @@ func New(development bool) {
 	//		go func() {
 	//			//!!! 此处会修改 entry.Stack 防止 stacktrace 过长
 	//			stack := []rune(entry.Stack)
-	//			entry.Stack = string(stack[:2048])
+	//			if len(stack) > 2048 {
+	//				entry.Stack = string(stack[:2048])
+	//			}
 	//			if err := dingtalk.Instance("").SendTextMessage(base.ToJsonString(entry), nil, false); err != nil {
 	//				fmt.Println("钉钉发送消息失败:" + err.Error())
 	//			}
