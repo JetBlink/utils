@@ -18,6 +18,7 @@ type Config struct {
 	Development bool `json:"development" yaml:"development"`
 	// DisableCaller stops annotating logs with the calling function's file
 	// name and line number. By default, all logs are annotated.
+	// 调用 log方法 的文件名和行号
 	DisableCaller bool `json:"disableCaller" yaml:"disableCaller"`
 	// DisableStacktrace completely disables automatic stacktrace capturing. By
 	// default, stacktraces are captured for WarnLevel and above logs in
@@ -32,10 +33,9 @@ type Config struct {
 	// "console", as well as any third-party encodings registered via
 	// RegisterEncoder.
 	Encoder zapcore.Encoder
-	// A WriteSyncer is an io.Writer that can also flush any buffered data. Note
-	// that *os.File (and thus, os.Stderr and os.Stdout) implement WriteSyncer.
+
 	WriteSyncer zapcore.WriteSyncer
-	// InitialFields is a collection of fields to add to the root logger.
+
 	InitialFields map[string]interface{} `json:"initialFields" yaml:"initialFields"`
 }
 
@@ -57,12 +57,16 @@ func (cfg Config) buildOptions() []zap.Option {
 		opts = append(opts, zap.Development())
 	}
 
+	//记录 log 的调用文件名和行号
 	if !cfg.DisableCaller {
 		opts = append(opts, zap.AddCaller())
 		opts = append(opts, zap.AddCallerSkip(1))
 	}
 
+	//stacktrace
+	//正式环境 error 级别以上记录 stacktrace
 	stackLevel := zap.ErrorLevel
+	//开发环境 warn 级别以上记录 stacktrace
 	if cfg.Development {
 		stackLevel = zap.WarnLevel
 	}

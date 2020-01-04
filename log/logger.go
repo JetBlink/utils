@@ -43,9 +43,13 @@ func New(development bool) {
 	}
 
 	opts := make([]zap.Option, 0, 1)
+	//todo 增加钉钉消息
 	//opts = append(opts, zap.Hooks(func(entry zapcore.Entry) error {
 	//	if zap.WarnLevel.Enabled(entry.Level) {
 	//		go func() {
+	//			//!!! 此处会修改 entry.Stack 防止 stacktrace 过长
+	//			stack := []rune(entry.Stack)
+	//			entry.Stack = string(stack[:2048])
 	//			if err := dingtalk.Instance("").SendTextMessage(base.ToJsonString(entry), nil, false); err != nil {
 	//				fmt.Println("钉钉发送消息失败:" + err.Error())
 	//			}
@@ -78,6 +82,7 @@ func NewProduction() Config {
 	encoderConfig.EncodeTime = zapcore.ISO8601TimeEncoder
 
 	//https://github.com/natefinch/lumberjack
+	//go get -u gopkg.in/natefinch/lumberjack.v2
 	//w := &lumberjack.Logger{
 	//	Filename:   "/tmp/log-test-demo.log",
 	//	MaxSize:    500, // megabytes

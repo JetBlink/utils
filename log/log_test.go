@@ -5,7 +5,7 @@ import (
 )
 
 func TestLogMessages(t *testing.T) {
-	_ = New(true)
+	New(true)
 	defer Sync()
 	Info("this is a test message")
 }
